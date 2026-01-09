@@ -1,0 +1,1 @@
+export const env={"PUBLIC_SUBMISSION_ENDPOINT":"https://recharge-backend.netlify.app/.netlify/functions/submit"}
