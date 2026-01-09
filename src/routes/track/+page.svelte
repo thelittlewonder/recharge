@@ -2,6 +2,7 @@
 	import { base } from '$app/paths';
 	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
+	import { fade } from 'svelte/transition';
 
 	interface LocationInfo {
 		title: string;
@@ -100,7 +101,12 @@
 	}
 
 	function getDaysUntilTrip(): number {
-		const today = new Date();
+		let today: Date;
+		if (debugMode && debugDate) {
+			today = new Date(debugDate);
+		} else {
+			today = new Date();
+		}
 		today.setHours(0, 0, 0, 0);
 		const start = new Date(TRIP_START);
 		start.setHours(0, 0, 0, 0);
@@ -110,7 +116,12 @@
 	}
 
 	function getDaysUntilBack(): number {
-		const today = new Date();
+		let today: Date;
+		if (debugMode && debugDate) {
+			today = new Date(debugDate);
+		} else {
+			today = new Date();
+		}
 		today.setHours(0, 0, 0, 0);
 		const returnDate = new Date(RETURN_DATE);
 		returnDate.setHours(0, 0, 0, 0);
@@ -125,10 +136,23 @@
 	let daysUntilBack = 0;
 	let isBeforeTrip = false;
 	let isAfterTrip = false;
+	
+	// Debug mode
+	let debugDate: string | null = null;
+	let debugMode = false;
+	let clickCount = 0;
+	let clickTimeout: ReturnType<typeof setTimeout> | null = null;
 
 	function updateState() {
 		currentDate = new Date();
-		const today = new Date();
+		let today: Date;
+		
+		if (debugMode && debugDate) {
+			today = new Date(debugDate);
+		} else {
+			today = new Date();
+		}
+		
 		today.setHours(0, 0, 0, 0);
 		const start = new Date(TRIP_START);
 		start.setHours(0, 0, 0, 0);
@@ -168,6 +192,16 @@
 			// Then update every 24 hours
 			setInterval(updateState, 24 * 60 * 60 * 1000);
 		}, msUntilMidnight);
+
+		// Add click listener for debug mode toggle
+		window.addEventListener('click', handlePageClick);
+		
+		return () => {
+			window.removeEventListener('click', handlePageClick);
+			if (clickTimeout) {
+				clearTimeout(clickTimeout);
+			}
+		};
 	});
 
 	let imageLoaded = false;
@@ -203,32 +237,96 @@
 	function handleInstagramButton() {
 		window.open('https://instagram.com/abh_.shek', '_blank');
 	}
+
+	function handleDebugDateChange() {
+		if (debugDate) {
+			updateState();
+		}
+	}
+
+	function resetDebugDate() {
+		debugDate = null;
+		debugMode = false;
+		updateState();
+	}
+
+	function handlePageClick() {
+		clickCount++;
+		
+		// Clear existing timeout
+		if (clickTimeout) {
+			clearTimeout(clickTimeout);
+		}
+		
+		// If 5 clicks, toggle debug mode
+		if (clickCount >= 5) {
+			toggleDebugMode();
+			clickCount = 0;
+		} else {
+			// Reset counter after 2 seconds of no clicks
+			clickTimeout = setTimeout(() => {
+				clickCount = 0;
+			}, 2000);
+		}
+	}
+
+	function toggleDebugMode() {
+		debugMode = !debugMode;
+		if (debugMode && !debugDate) {
+			// Set default to today
+			const today = new Date();
+			debugDate = today.toISOString().split('T')[0];
+		}
+		updateState();
+	}
 </script>
+
+<!-- Debug Controller -->
+{#if debugMode}
+	<div class="debug-controller">
+		<div class="debug-panel">
+			<label>
+				Test Date:
+				<input 
+					type="date" 
+					bind:value={debugDate}
+					on:change={handleDebugDateChange}
+					class="debug-input"
+				/>
+			</label>
+			<button class="debug-reset" on:click={resetDebugDate}>Reset to Today</button>
+			<button class="debug-close" on:click={toggleDebugMode}>Close Debug</button>
+			{#if debugDate}
+				<p class="debug-info">Showing: {new Date(debugDate).toLocaleDateString()}</p>
+			{/if}
+		</div>
+	</div>
+{/if}
 
 <div class="track-container">
 	{#if isBeforeTrip}
 		<!-- Empty state: Before trip -->
-		<div class="empty-state">
+		<div class="empty-state" transition:fade={{ duration: 300, delay: 100 }}>
 			<h1 class="empty-title">
 				Abhishek's recharge is {daysUntilTrip} {daysUntilTrip === 1 ? 'day' : 'days'} away
 			</h1>
 		</div>
-		<div class="button-container">
+		<div class="button-container" transition:fade={{ duration: 300, delay: 200 }}>
 			<button class="cta-button" on:click={handleBackToRecharge}>See the plan</button>
 		</div>
-		<p class="meta-text">Away from May 2 - June 7.</p>
+		<p class="meta-text" transition:fade={{ duration: 300, delay: 250 }}>Away from May 2 - June 7.</p>
 	{:else if isAfterTrip}
 		<!-- Empty state: After trip -->
-		<div class="empty-state">
+		<div class="empty-state" transition:fade={{ duration: 300, delay: 100 }}>
 			<h1 class="empty-title">Abhishek's recharge is over.</h1>
 		</div>
-		<div class="button-container">
+		<div class="button-container" transition:fade={{ duration: 300, delay: 200 }}>
 			<button class="cta-button" on:click={handleInstagramButton}>Stalk stories on Instagram</button>
 		</div>
-		<p class="meta-text">Back in business officially, June 8th</p>
+		<p class="meta-text" transition:fade={{ duration: 300, delay: 250 }}>Back in business officially, June 8th</p>
 	{:else if location}
 		<!-- Location card during trip -->
-		<div class="location-card">
+		<div class="location-card" class:visible={imageLoaded}>
 			{#if location.image}
 				<img 
 					bind:this={imageElement}
@@ -246,10 +344,10 @@
 			</h2>
 			<p class="card-description">{location.description}</p>
 		</div>
-		<div class="button-container">
+		<div class="button-container" class:visible={imageLoaded}>
 			<button class="cta-button" on:click={handleCallButton}>Call Abhishek if it's urgent</button>
 		</div>
-		<p class="meta-text">{daysUntilBack} {daysUntilBack === 1 ? 'day' : 'days'} until he's back to work</p>
+		<p class="meta-text" class:visible={imageLoaded}>{daysUntilBack} {daysUntilBack === 1 ? 'day' : 'days'} until he's back to work</p>
 	{/if}
 </div>
 
@@ -292,6 +390,15 @@
 		box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.05);
 		display: flex;
 		flex-direction: column;
+		opacity: 0;
+		transform: rotate(-2deg) translateY(20px);
+		transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+		will-change: opacity, transform;
+	}
+
+	.location-card.visible {
+		opacity: 1;
+		transform: rotate(-2deg) translateY(0);
 	}
 
 	.card-image {
@@ -337,6 +444,20 @@
 		max-width: 700px;
 	}
 
+	/* Animation styles only for location card state */
+	.location-card ~ .button-container {
+		opacity: 0;
+		transform: translateY(10px);
+		transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+		transition-delay: 0.2s;
+		will-change: opacity, transform;
+	}
+
+	.location-card.visible ~ .button-container {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
 	.meta-text {
 		font-family: 'Google Sans Flex', sans-serif;
 		font-size: 14px;
@@ -344,6 +465,20 @@
 		opacity: 0.5;
 		margin-top: 12px;
 		text-align: center;
+	}
+
+	/* Animation styles only for location card state */
+	.location-card ~ .meta-text {
+		opacity: 0;
+		transform: translateY(10px);
+		transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+		transition-delay: 0.3s;
+		will-change: opacity, transform;
+	}
+
+	.location-card.visible ~ .meta-text {
+		opacity: 0.5;
+		transform: translateY(0);
 	}
 
 	@media (max-width: 768px) {
@@ -363,6 +498,102 @@
 	@media (prefers-reduced-motion: reduce) {
 		.card-image {
 			transition: opacity 0.1s ease-in-out;
+		}
+
+		.location-card,
+		.button-container,
+		.meta-text {
+			transition: opacity 0.1s ease-out;
+			transform: none !important;
+		}
+
+		.location-card.visible {
+			transform: rotate(-2deg) !important;
+		}
+	}
+
+	/* Debug Controller */
+	.debug-controller {
+		position: fixed;
+		top: var(--spacing);
+		right: var(--spacing);
+		z-index: 1000;
+		background-color: var(--card-bg);
+		border-radius: var(--border-radius);
+		padding: 12px;
+		box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
+		min-width: 200px;
+	}
+
+	.debug-panel {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.debug-panel label {
+		font-family: 'Google Sans Flex', sans-serif;
+		font-size: 12px;
+		color: var(--text-color);
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+	}
+
+	.debug-input {
+		font-family: 'Google Sans Flex', sans-serif;
+		font-size: 14px;
+		padding: 8px;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 4px;
+		background-color: var(--card-bg);
+		color: var(--text-color);
+	}
+
+	.debug-reset,
+	.debug-close {
+		background-color: transparent;
+		color: var(--text-color);
+		font-family: 'Google Sans Flex', sans-serif;
+		font-size: 12px;
+		padding: 6px 12px;
+		border: 1px solid rgba(0, 0, 0, 0.2);
+		border-radius: 4px;
+		cursor: pointer;
+		transition: background-color 0.2s ease-out;
+	}
+
+	.debug-reset:hover,
+	.debug-close:hover {
+		background-color: rgba(0, 0, 0, 0.05);
+	}
+
+	.debug-close {
+		background-color: var(--cta-bg);
+		color: #FFFFFF;
+		margin-top: 4px;
+	}
+
+	.debug-close:hover {
+		opacity: 0.9;
+		background-color: var(--cta-bg);
+	}
+
+	.debug-info {
+		font-family: 'Google Sans Flex', sans-serif;
+		font-size: 11px;
+		color: var(--text-color);
+		opacity: 0.6;
+		margin: 0;
+		text-align: center;
+	}
+
+	@media (max-width: 768px) {
+		.debug-controller {
+			top: 8px;
+			right: 8px;
+			left: 8px;
+			min-width: auto;
 		}
 	}
 </style>
