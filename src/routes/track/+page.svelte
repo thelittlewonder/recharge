@@ -100,12 +100,7 @@
 	}
 
 	function getDaysUntilTrip(): number {
-		let today: Date;
-		if (debugMode && debugDate) {
-			today = new Date(debugDate);
-		} else {
-			today = new Date();
-		}
+		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 		const start = new Date(TRIP_START);
 		start.setHours(0, 0, 0, 0);
@@ -115,12 +110,7 @@
 	}
 
 	function getDaysUntilBack(): number {
-		let today: Date;
-		if (debugMode && debugDate) {
-			today = new Date(debugDate);
-		} else {
-			today = new Date();
-		}
+		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 		const returnDate = new Date(RETURN_DATE);
 		returnDate.setHours(0, 0, 0, 0);
@@ -135,21 +125,10 @@
 	let daysUntilBack = 0;
 	let isBeforeTrip = false;
 	let isAfterTrip = false;
-	
-	// Debug mode
-	let debugDate: string | null = null;
-	let debugMode = false;
 
 	function updateState() {
 		currentDate = new Date();
-		let today: Date;
-		
-		if (debugMode && debugDate) {
-			today = new Date(debugDate);
-		} else {
-			today = new Date();
-		}
-		
+		const today = new Date();
 		today.setHours(0, 0, 0, 0);
 		const start = new Date(TRIP_START);
 		start.setHours(0, 0, 0, 0);
@@ -224,53 +203,7 @@
 	function handleInstagramButton() {
 		window.open('https://instagram.com/abh_.shek', '_blank');
 	}
-
-	function handleDebugDateChange() {
-		if (debugDate) {
-			updateState();
-		}
-	}
-
-	function resetDebugDate() {
-		debugDate = null;
-		debugMode = false;
-		updateState();
-	}
-
-	function toggleDebugMode() {
-		debugMode = !debugMode;
-		if (debugMode && !debugDate) {
-			// Set default to today
-			const today = new Date();
-			debugDate = today.toISOString().split('T')[0];
-		}
-		updateState();
-	}
 </script>
-
-<!-- Debug Controller -->
-<div class="debug-controller">
-	<button class="debug-toggle" on:click={toggleDebugMode}>
-		{debugMode ? '🔧 Debug ON' : '🔧 Debug OFF'}
-	</button>
-	{#if debugMode}
-		<div class="debug-panel">
-			<label>
-				Test Date:
-				<input 
-					type="date" 
-					bind:value={debugDate}
-					on:change={handleDebugDateChange}
-					class="debug-input"
-				/>
-			</label>
-			<button class="debug-reset" on:click={resetDebugDate}>Reset to Today</button>
-			{#if debugDate}
-				<p class="debug-info">Showing: {new Date(debugDate).toLocaleDateString()}</p>
-			{/if}
-		</div>
-	{/if}
-</div>
 
 <div class="track-container">
 	{#if isBeforeTrip}
@@ -430,98 +363,6 @@
 	@media (prefers-reduced-motion: reduce) {
 		.card-image {
 			transition: opacity 0.1s ease-in-out;
-		}
-	}
-
-	/* Debug Controller */
-	.debug-controller {
-		position: fixed;
-		top: var(--spacing);
-		right: var(--spacing);
-		z-index: 1000;
-		background-color: var(--card-bg);
-		border-radius: var(--border-radius);
-		padding: 12px;
-		box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1);
-		min-width: 200px;
-	}
-
-	.debug-toggle {
-		background-color: var(--cta-bg);
-		color: #FFFFFF;
-		font-family: 'Google Sans Flex', sans-serif;
-		font-size: 14px;
-		font-weight: 500;
-		padding: 8px 16px;
-		border: none;
-		border-radius: 100px;
-		cursor: pointer;
-		width: 100%;
-		margin-bottom: 8px;
-		transition: opacity 0.2s ease-out;
-	}
-
-	.debug-toggle:hover {
-		opacity: 0.9;
-	}
-
-	.debug-panel {
-		display: flex;
-		flex-direction: column;
-		gap: 8px;
-		margin-top: 8px;
-	}
-
-	.debug-panel label {
-		font-family: 'Google Sans Flex', sans-serif;
-		font-size: 12px;
-		color: var(--text-color);
-		display: flex;
-		flex-direction: column;
-		gap: 4px;
-	}
-
-	.debug-input {
-		font-family: 'Google Sans Flex', sans-serif;
-		font-size: 14px;
-		padding: 8px;
-		border: 1px solid rgba(0, 0, 0, 0.2);
-		border-radius: 4px;
-		background-color: var(--card-bg);
-		color: var(--text-color);
-	}
-
-	.debug-reset {
-		background-color: transparent;
-		color: var(--text-color);
-		font-family: 'Google Sans Flex', sans-serif;
-		font-size: 12px;
-		padding: 6px 12px;
-		border: 1px solid rgba(0, 0, 0, 0.2);
-		border-radius: 4px;
-		cursor: pointer;
-		transition: background-color 0.2s ease-out;
-	}
-
-	.debug-reset:hover {
-		background-color: rgba(0, 0, 0, 0.05);
-	}
-
-	.debug-info {
-		font-family: 'Google Sans Flex', sans-serif;
-		font-size: 11px;
-		color: var(--text-color);
-		opacity: 0.6;
-		margin: 0;
-		text-align: center;
-	}
-
-	@media (max-width: 768px) {
-		.debug-controller {
-			top: 8px;
-			right: 8px;
-			left: 8px;
-			min-width: auto;
 		}
 	}
 </style>
