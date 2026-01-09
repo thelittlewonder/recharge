@@ -425,13 +425,37 @@ h1, h2, h3, h4, h5, h6 {
 		border-radius: var(--border-radius) var(--border-radius) 0 0;
 		max-width: 100%;
 		width: 100%;
-		max-height: 90vh;
 		grid-template-columns: 1fr;
 		margin: 0;
+		padding: 16px;
+	}
+
+	.modal-close {
+		top: 12px;
+		right: 12px;
+	}
+
+	.modal-form {
+		gap: 16px;
+		padding-right: 0;
+	}
+
+	.modal-title {
+		font-size: 28px;
+		margin-bottom: 16px;
+	}
+
+	.form-group {
+		margin-bottom: 16px;
 	}
 
 	.modal-placeholder {
 		display: none;
+	}
+
+	.modal-close.hide-mobile,
+	.modal-title.hide-mobile {
+		display: none !important;
 	}
 }
 

@@ -1,11 +1,12 @@
+# Dependencies
 node_modules
-.svelte-kit
-.vscode
-.DS_Store
-dist
-build
 
-# Env files (never commit secrets)
+# Build outputs
+.svelte-kit
+build
+dist
+
+# Environment variables (never commit secrets)
 .env
 .env.*
 
@@ -15,19 +16,20 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Editor / OS
+# Editor / IDE
+.vscode
+.idea
 *.swp
 *.swo
-*.log
 
+# OS
 .DS_Store
-node_modules
-/build
-/.svelte-kit
-/package
-.env
-.env.*
-!.env.example
+Thumbs.db
+
+# Deployment
+gh-pages
+
+# Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 

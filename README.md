@@ -41,6 +41,24 @@ npm run dev
 
 The project is configured for GitHub Pages deployment in a subdirectory (`/recharge`).
 
+### Quick Deploy
+
+Simply run:
+```bash
+npm run deploy
+```
+
+This script will:
+1. Build your project
+2. Copy files to the `gh-pages` branch
+3. Commit and push to GitHub
+
+Your site will be live at: `https://thelittlewonder.github.io/recharge/`
+
+### Manual Build
+
+If you prefer to build manually:
+
 1. Build the project:
 ```bash
 npm run build
@@ -48,9 +66,7 @@ npm run build
 
 2. The static files will be in the `build/` directory.
 
-3. For GitHub Pages deployment:
-   - Push the `build/` directory contents to the `gh-pages` branch, or
-   - Use GitHub Actions to automate deployment
+3. Manually push the `build/` directory contents to the `gh-pages` branch
 
 ## Project Structure
 

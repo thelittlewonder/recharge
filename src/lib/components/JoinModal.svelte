@@ -2,7 +2,8 @@
 	import { fly, fade } from 'svelte/transition';
 	import { submitToAirtable } from '../utils/airtable';
 	import type { Destination } from '../data/itinerary';
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
+	import { browser } from '$app/environment';
 	import SoutheastAsiaMap from './SoutheastAsiaMap.svelte';
 
 	export let destinations: Destination[];
@@ -14,6 +15,26 @@
 	let isSubmitting: boolean = false;
 	let message: { type: 'success' | 'error'; text: string } | null = null;
 	let isMobile: boolean = false;
+	let scrollY: number = 0;
+
+	// Lock body scroll when modal is open (browser only)
+	$: if (browser && open) {
+		// Save current scroll position
+		scrollY = window.scrollY;
+		// Lock body scroll
+		document.body.style.position = 'fixed';
+		document.body.style.top = `-${scrollY}px`;
+		document.body.style.width = '100%';
+		document.body.style.overflow = 'hidden';
+	} else if (browser && !open && scrollY > 0) {
+		// Restore body scroll
+		document.body.style.position = '';
+		document.body.style.top = '';
+		document.body.style.width = '';
+		document.body.style.overflow = '';
+		// Restore scroll position
+		window.scrollTo(0, scrollY);
+	}
 
 	onMount(() => {
 		const checkMobile = () => {
@@ -33,6 +54,16 @@
 			window.removeEventListener('resize', checkMobile);
 			window.removeEventListener('keydown', handleEscape);
 		};
+	});
+
+	onDestroy(() => {
+		// Ensure body scroll is restored when component is destroyed (browser only)
+		if (browser) {
+			document.body.style.position = '';
+			document.body.style.top = '';
+			document.body.style.width = '';
+			document.body.style.overflow = '';
+		}
 	});
 
 	function toggleDestination(id: string) {
@@ -106,19 +137,19 @@
 			on:keydown={handleBackdropKeydown}
 			aria-label="Close modal"
 		></button>
-	<div
+		<div
 		class="modal-content"
 		class:mobile={isMobile}
 		transition:fly={{ y: isMobile ? 300 : 0, duration: 300 }}
 	>
-			<button class="modal-close" on:click={onClose} aria-label="Close modal">×</button>
+			<button class="modal-close" class:hide-mobile={isMobile} on:click={onClose} aria-label="Close modal">×</button>
 
 			<div class="modal-placeholder">
 				<SoutheastAsiaMap {selectedDestinations} />
 			</div>
 
 			<div class="modal-form">
-				<h2 class="modal-title">Join Abhishek on his recharge</h2>
+				<h2 class="modal-title" class:hide-mobile={isMobile}>Join Abhishek on his recharge</h2>
 				<div class="form-group">
 					<p class="modal-question">Which trip do you want to join?</p>
 					<div class="checkbox-list">
@@ -211,6 +242,7 @@
 		position: relative;
 		z-index: 1;
 	}
+
 
 	.checkbox-item {
 		transition: transform 0.15s ease-out;
