@@ -206,24 +206,44 @@
 
 	let imageLoaded = false;
 	let imageElement: HTMLImageElement;
+	let pageReady = false;
 
 	function handleImageLoad() {
 		imageLoaded = true;
+		// Mark page as ready after image loads (or if no image needed)
+		setTimeout(() => {
+			pageReady = true;
+		}, 100);
 	}
 
 	function handleImageError() {
 		imageLoaded = true;
+		// Mark page as ready even if image fails
+		setTimeout(() => {
+			pageReady = true;
+		}, 100);
 	}
 
 	// Reset image loaded state when location changes
 	$: if (location) {
 		imageLoaded = false;
+		pageReady = false;
 		// Check if image is already loaded (cached) after a brief delay
 		setTimeout(() => {
 			if (imageElement && imageElement.complete && imageElement.naturalHeight !== 0) {
 				imageLoaded = true;
+				setTimeout(() => {
+					pageReady = true;
+				}, 100);
 			}
 		}, 0);
+	}
+
+	// For states without images, mark as ready immediately
+	$: if ((isBeforeTrip || isAfterTrip) && !pageReady) {
+		setTimeout(() => {
+			pageReady = true;
+		}, 150);
 	}
 
 	function handleBackToRecharge() {
@@ -303,7 +323,29 @@
 	</div>
 {/if}
 
-<div class="track-container">
+{#if !pageReady}
+	<div class="loader-overlay" transition:fade={{ duration: 200 }}>
+		<div class="loader-content">
+			{#if location && location.image}
+				<!-- Skeleton for location card with image -->
+				<div class="skeleton-card">
+					<div class="skeleton-image"></div>
+					<div class="skeleton-title"></div>
+					<div class="skeleton-text"></div>
+				</div>
+				<div class="skeleton-button"></div>
+				<div class="skeleton-meta"></div>
+			{:else}
+				<!-- Skeleton for empty states -->
+				<div class="skeleton-empty-title"></div>
+				<div class="skeleton-button"></div>
+				<div class="skeleton-meta"></div>
+			{/if}
+		</div>
+	</div>
+{/if}
+
+<div class="track-container" class:ready={pageReady}>
 	{#if isBeforeTrip}
 		<!-- Empty state: Before trip -->
 		<div class="empty-state" transition:fade={{ duration: 300, delay: 100 }}>
@@ -363,6 +405,131 @@
 		align-items: center;
 		justify-content: center;
 		min-height: 100vh;
+		opacity: 0;
+		transition: opacity 0.3s ease-in;
+	}
+
+	.track-container.ready {
+		opacity: 1;
+	}
+
+	.loader-overlay {
+		position: fixed;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background-color: var(--bg-color);
+		z-index: 999;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.loader-content {
+		width: 100%;
+		max-width: 700px;
+		padding: var(--spacing);
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 64px;
+	}
+
+	.skeleton-card {
+		background-color: var(--card-bg);
+		border-radius: var(--border-radius);
+		padding: var(--spacing);
+		max-width: 700px;
+		width: 100%;
+		transform: rotate(-2deg);
+		box-shadow: 0px 4px 40px rgba(0, 0, 0, 0.05);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.skeleton-image {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: skeleton-loading 1.5s ease-in-out infinite;
+		border-radius: var(--border-radius);
+		margin-bottom: var(--spacing);
+	}
+
+	.skeleton-title {
+		width: 70%;
+		height: 32px;
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: skeleton-loading 1.5s ease-in-out infinite;
+		border-radius: 4px;
+		margin-bottom: 8px;
+	}
+
+	.skeleton-text {
+		width: 100%;
+		height: 18px;
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: skeleton-loading 1.5s ease-in-out infinite;
+		border-radius: 4px;
+		margin-bottom: 8px;
+	}
+
+	.skeleton-button {
+		width: 100%;
+		max-width: 300px;
+		height: 48px;
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: skeleton-loading 1.5s ease-in-out infinite;
+		border-radius: var(--border-radius);
+	}
+
+	.skeleton-meta {
+		width: 200px;
+		height: 14px;
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: skeleton-loading 1.5s ease-in-out infinite;
+		border-radius: 4px;
+	}
+
+	.skeleton-empty-title {
+		width: 100%;
+		max-width: 600px;
+		height: 64px;
+		background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+		background-size: 200% 100%;
+		animation: skeleton-loading 1.5s ease-in-out infinite;
+		border-radius: 4px;
+	}
+
+	@keyframes skeleton-loading {
+		0% {
+			background-position: 200% 0;
+		}
+		100% {
+			background-position: -200% 0;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.skeleton-image,
+		.skeleton-title,
+		.skeleton-text,
+		.skeleton-button,
+		.skeleton-meta,
+		.skeleton-empty-title {
+			animation: none;
+			background: #f0f0f0;
+		}
+
+		.track-container {
+			transition: none;
+		}
 	}
 
 	.empty-state {

@@ -16,24 +16,79 @@
 	let message: { type: 'success' | 'error'; text: string } | null = null;
 	let isMobile: boolean = false;
 	let scrollY: number = 0;
+	let isClosing: boolean = false;
+	let previouslyFocusedElement: HTMLElement | null = null;
 
-	// Lock body scroll when modal is open (browser only)
-	$: if (browser && open) {
-		// Save current scroll position
-		scrollY = window.scrollY;
-		// Lock body scroll
-		document.body.style.position = 'fixed';
-		document.body.style.top = `-${scrollY}px`;
-		document.body.style.width = '100%';
-		document.body.style.overflow = 'hidden';
-	} else if (browser && !open && scrollY > 0) {
-		// Restore body scroll
+	function restoreScroll() {
+		if (!browser || scrollY === 0) return;
+		
+		const savedScrollY = scrollY;
+		scrollY = 0; // Reset immediately to prevent multiple calls
+		
+		// Critical: Set scroll position BEFORE removing fixed positioning
+		// We do this by temporarily allowing scroll on documentElement
+		// while body is still fixed, then remove fixed
+		const originalScrollBehavior = document.documentElement.style.scrollBehavior;
+		document.documentElement.style.scrollBehavior = 'auto';
+		
+		// Set scroll position while body is still fixed (this won't visually move anything)
+		// but prepares the browser for when we remove fixed
+		window.history.scrollRestoration = 'manual';
+		
+		// Now remove fixed positioning and set scroll in the same frame
 		document.body.style.position = '';
 		document.body.style.top = '';
 		document.body.style.width = '';
 		document.body.style.overflow = '';
-		// Restore scroll position
-		window.scrollTo(0, scrollY);
+		document.documentElement.style.overflow = '';
+		
+		// Immediately restore scroll - must be synchronous
+		window.scrollTo(0, savedScrollY);
+		document.documentElement.scrollTop = savedScrollY;
+		
+		// Use RAF to ensure it sticks
+		requestAnimationFrame(() => {
+			window.scrollTo({ top: savedScrollY, behavior: 'auto' });
+			document.documentElement.style.scrollBehavior = originalScrollBehavior;
+			window.history.scrollRestoration = 'auto';
+		});
+	}
+
+	// Lock body scroll when modal is open (browser only)
+	$: if (browser && open) {
+		isClosing = false;
+		// Save currently focused element to restore later
+		previouslyFocusedElement = document.activeElement as HTMLElement;
+		// Save current scroll position
+		scrollY = window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
+		// Lock body scroll - also lock html to prevent any scrolling
+		document.body.style.position = 'fixed';
+		document.body.style.top = `-${scrollY}px`;
+		document.body.style.width = '100%';
+		document.body.style.overflow = 'hidden';
+		document.documentElement.style.overflow = 'hidden';
+	} else if (browser && !open && scrollY > 0 && !isClosing) {
+		isClosing = true;
+		// Wait for transition to complete before restoring scroll
+		// The longest transition is 300ms (fly transition), so wait a bit longer
+		setTimeout(() => {
+			restoreScroll();
+			// Restore focus without scrolling
+			if (previouslyFocusedElement && previouslyFocusedElement.focus) {
+				// Prevent scroll when restoring focus
+				const savedScrollX = window.scrollX;
+				const savedScrollYPos = window.scrollY;
+				previouslyFocusedElement.focus({ preventScroll: true });
+				// If focus caused a scroll, restore it immediately
+				requestAnimationFrame(() => {
+					if (window.scrollY !== savedScrollYPos) {
+						window.scrollTo(savedScrollX, savedScrollYPos);
+					}
+				});
+			}
+			isClosing = false;
+			previouslyFocusedElement = null;
+		}, 350); // Wait slightly longer than the longest transition (300ms)
 	}
 
 	onMount(() => {
@@ -63,6 +118,10 @@
 			document.body.style.top = '';
 			document.body.style.width = '';
 			document.body.style.overflow = '';
+			document.documentElement.style.overflow = '';
+			if (scrollY > 0) {
+				window.scrollTo({ top: scrollY, behavior: 'auto' });
+			}
 		}
 	});
 
