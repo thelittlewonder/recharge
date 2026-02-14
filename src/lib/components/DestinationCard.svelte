@@ -49,9 +49,9 @@
 	</h2>
 	{#if destination.description}
 		{#if destination.isSummary}
-			{@const parts = destination.description.split(' Back in London, June 8th.')}
+			{@const parts = destination.description.split(' Back in London, June 9th.')}
 			<p class="card-description">{parts[0]}</p>
-			<p class="card-dates">Back in London, June 8th.</p>
+			<p class="card-dates">Back in London, June 9th.</p>
 		{:else}
 			<p class="card-description">{destination.description}</p>
 		{/if}

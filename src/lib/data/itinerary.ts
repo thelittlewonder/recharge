@@ -61,14 +61,14 @@ export const destinations: Destination[] = [
 		id: 'bali',
 		title: 'Bali',
 		description: 'Deliberate downtime by the sea—runs, yoga, cafés.',
-		dates: 'May 20th - May 25th',
+		dates: 'May 20th - May 26th',
 		image: `${base}/images/bali.jpg`,
 		columnSpan: 6
 	},
 	{
 		id: 'summary',
 		title: "That's all.",
-		description: 'Rest of the time in north India with family. Back in London, June 8th.',
+		description: 'Rest of the time in north India with family. Back in London, June 9th.',
 		dates: '',
 		image: '',
 		columnSpan: 4,

@@ -12,8 +12,8 @@
 
 	// Date ranges for locations (inclusive)
 	const TRIP_START = new Date(2026, 4, 2); // May 2, 2026 (month is 0-indexed)
-	const TRIP_END = new Date(2026, 5, 7); // June 7, 2026
-	const RETURN_DATE = new Date(2026, 5, 8); // June 8, 2026
+	const TRIP_END = new Date(2026, 5, 8); // June 8, 2026
+	const RETURN_DATE = new Date(2026, 5, 9); // June 9, 2026
 
 	function getLocationForDate(date: Date): LocationInfo | null {
 		const year = date.getFullYear();
@@ -79,8 +79,8 @@
 			};
 		}
 
-		// May 21-25: Bali
-		if (month === 4 && day >= 21 && day <= 25) {
+		// May 21-26: Bali
+		if (month === 4 && day >= 21 && day <= 26) {
 			return {
 				title: 'Bali',
 				description: 'Sitting by the beach, trying to not think about work.',
@@ -88,8 +88,8 @@
 			};
 		}
 
-		// May 26 - June 7: India
-		if ((month === 4 && day >= 26) || (month === 5 && day <= 7)) {
+		// May 26 - June 8: India
+		if ((month === 4 && day >= 26) || (month === 5 && day <= 8)) {
 			return {
 				title: 'India',
 				description: 'Catching up on sleep debt and editing photos from his recharge.',
@@ -356,7 +356,7 @@
 		<div class="button-container" transition:fade={{ duration: 300, delay: 200 }}>
 			<button class="cta-button" on:click={handleBackToRecharge}>See the plan</button>
 		</div>
-		<p class="meta-text" transition:fade={{ duration: 300, delay: 250 }}>Away from May 2 - June 7.</p>
+		<p class="meta-text" transition:fade={{ duration: 300, delay: 250 }}>Away from May 2 - June 8.</p>
 	{:else if isAfterTrip}
 		<!-- Empty state: After trip -->
 		<div class="empty-state" transition:fade={{ duration: 300, delay: 100 }}>
@@ -365,7 +365,7 @@
 		<div class="button-container" transition:fade={{ duration: 300, delay: 200 }}>
 			<button class="cta-button" on:click={handleInstagramButton}>Stalk stories on Instagram</button>
 		</div>
-		<p class="meta-text" transition:fade={{ duration: 300, delay: 250 }}>Back in business officially, June 8th</p>
+		<p class="meta-text" transition:fade={{ duration: 300, delay: 250 }}>Back in business officially, June 9th</p>
 	{:else if location}
 		<!-- Location card during trip -->
 		<div class="location-card" class:visible={imageLoaded}>
