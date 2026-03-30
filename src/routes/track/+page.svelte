@@ -25,8 +25,8 @@
 			return null;
 		}
 
-		// May 2-6: Taiwan
-		if (month === 4 && day >= 2 && day <= 6) {
+		// May 2-7: Taiwan
+		if (month === 4 && day >= 2 && day <= 7) {
 			return {
 				title: 'Taiwan',
 				description: 'Exploring food, history, nature and culture.',
@@ -34,8 +34,8 @@
 			};
 		}
 
-		// May 7-10: Kinabatangan
-		if (month === 4 && day >= 7 && day <= 10) {
+		// May 8-11: Kinabatangan
+		if (month === 4 && day >= 8 && day <= 11) {
 			return {
 				title: 'Kinabatangan',
 				description: 'Looking for orangutans. Wish him all the luck!',
@@ -43,20 +43,11 @@
 			};
 		}
 
-		// May 11: Kuala Lumpur
-		if (month === 4 && day === 11) {
-			return {
-				title: 'Kuala Lumpur',
-				description: 'Walking around and looking for good veggie food.',
-				image: `${base}/images/kualalumpur.jpg`
-			};
-		}
-
 		// May 12-15: Yogyakarta
 		if (month === 4 && day >= 12 && day <= 15) {
 			return {
-				title: 'Yogyakarta',
-				description: 'Chasing sunrises and ancient indonesian history.',
+				title: 'Yogyakarta & Kuala Lumpur',
+				description: 'Chasing sunrises and ancient Indonesian history, plus city time in Kuala Lumpur.',
 				image: `${base}/images/yogyakarta.jpg`
 			};
 		}
@@ -70,8 +61,8 @@
 			};
 		}
 
-		// May 18-20: Labuan Bajo (Komodo)
-		if (month === 4 && day >= 18 && day <= 20) {
+		// May 18-19: Labuan Bajo (Komodo)
+		if (month === 4 && day >= 18 && day <= 19) {
 			return {
 				title: 'Labuan Bajo',
 				description: 'Looking for Komodo dragons and fighting sea sickness.',
@@ -79,8 +70,8 @@
 			};
 		}
 
-		// May 21-26: Bali
-		if (month === 4 && day >= 21 && day <= 26) {
+		// May 20-26: Bali
+		if (month === 4 && day >= 20 && day <= 26) {
 			return {
 				title: 'Bali',
 				description: 'Sitting by the beach, trying to not think about work.',

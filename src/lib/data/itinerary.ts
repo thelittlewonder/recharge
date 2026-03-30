@@ -17,7 +17,7 @@ export const destinations: Destination[] = [
 		id: 'taiwan',
 		title: 'Taiwan',
 		description: 'Mountain hikes, old mining towns, and dramatic coastline—Yangmingshan, Jiufen, Jinguashi, and Yehliu.',
-		dates: 'May 2nd - May 6th',
+		dates: 'May 2nd - May 7th',
 		image: `${base}/images/taiwan.jpg`,
 		columnSpan: 6
 	},
@@ -25,7 +25,7 @@ export const destinations: Destination[] = [
 		id: 'yogyakarta',
 		title: 'Yogyakarta & Kuala Lumpur',
 		description: 'Urban Asia meets Javanese culture—food, temples, art.',
-		dates: 'May 11th - May 15th',
+		dates: 'May 12th - May 15th',
 		image: `${base}/images/yogyakarta.jpg`,
 		columnSpan: 6,
 		isTall: true
@@ -34,7 +34,7 @@ export const destinations: Destination[] = [
 		id: 'komodo',
 		title: 'Komodo National Park',
 		description: 'Luxury boat journey to pink beaches, island hikes, and Komodo dragons in the wild.',
-		dates: 'May 17th - May 20th',
+		dates: 'May 18th - May 19th',
 		image: `${base}/images/komodo.jpg`,
 		columnSpan: 10,
 		isWide: true
@@ -43,7 +43,7 @@ export const destinations: Destination[] = [
 		id: 'kinabatangan',
 		title: 'Kinabatangan Safari',
 		description: 'River safaris through dense rainforest to spot orangutans, proboscis monkeys, birds, and crocodiles.',
-		dates: 'May 7th - May 10th',
+		dates: 'May 8th - May 11th',
 		image: `${base}/images/kinabatangan.jpg`,
 		columnSpan: 4,
 		isTall: true
@@ -52,7 +52,7 @@ export const destinations: Destination[] = [
 		id: 'bromo',
 		title: 'Mount Bromo',
 		description: 'Sunrise hike across an active volcano',
-		dates: 'May 15th - May 16th',
+		dates: 'May 16th - May 17th',
 		image: `${base}/images/bromo.jpg`,
 		columnSpan: 4
 	},

@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { destinations } from '$lib/data/itinerary';
 	import DestinationCard from '$lib/components/DestinationCard.svelte';
-	import JoinModal from '$lib/components/JoinModal.svelte';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
-	let modalOpen = false;
 	let isMobile = false;
 	let imagesLoaded = 0;
 	let allImagesLoaded = false;
@@ -19,12 +17,12 @@
 	
 	// Mobile order: chronological (by dates)
 	const mobileOrder = [
-		'taiwan',        // May 2-6
-		'kinabatangan',  // May 7-10
-		'yogyakarta',    // May 11-15
-		'bromo',         // May 15-16
-		'komodo',        // May 17-20
-		'bali',          // May 20-25
+		'taiwan',        // May 2-7
+		'kinabatangan',  // May 8-11
+		'yogyakarta',    // May 12-15
+		'bromo',         // May 16-17
+		'komodo',        // May 18-19
+		'bali',          // May 20-26
 		'summary'
 	];
 	
@@ -114,14 +112,6 @@
 		setupScrollObserver();
 	}
 
-	function openModal() {
-		modalOpen = true;
-	}
-
-	function closeModal() {
-		modalOpen = false;
-	}
-
 	function scrollToTop() {
 		window.scrollTo({ top: 0, behavior: 'smooth' });
 	}
@@ -132,9 +122,6 @@
 			allImagesLoaded = true;
 		}
 	}
-
-	// Filter destinations for the modal (exclude summary)
-	const modalDestinations = destinations.filter((d) => !d.isSummary);
 </script>
 
 <div class="page-title-container">
@@ -172,7 +159,12 @@
 			{#if destination.isSummary}
 				<DestinationCard {destination} on:imageloaded={handleImageLoaded}>
 					<div class="summary-actions">
-						<button class="cta-button" on:click={openModal}>Join Abhishek</button>
+						<button
+							class="cta-button"
+							on:click={() => window.open('https://instagram.com/abh_.shek', '_blank')}
+						>
+							Stalk stories on Instagram
+						</button>
 						<button type="button" class="back-to-top" on:click={scrollToTop}>Back to top</button>
 					</div>
 				</DestinationCard>
@@ -182,8 +174,6 @@
 		</div>
 	{/each}
 </div>
-
-<JoinModal destinations={modalDestinations} open={modalOpen} onClose={closeModal} />
 
 <style>
 	.page-title-container {
